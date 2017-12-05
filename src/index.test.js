@@ -7,7 +7,12 @@ import {
   string,
   boolean
 } from "validated/schema";
-import { defaultValue, parseCliArguments, type Type } from ".";
+import {
+  defaultValue,
+  parseCliArguments,
+  type Type,
+  CliArgumentError
+} from ".";
 
 describe("defaultValue", () => {
   it("returns false for boolean", () => {
@@ -63,5 +68,36 @@ describe("parseCliArguments", () => {
   it("returns 'false' when boolean flags are not passed in", () => {
     const args = parseCliArguments(configType, []);
     expect(args).toEqual({ foo: false });
+  });
+
+  describe("multiple flags", () => {
+    let configType;
+    beforeEach(() => {
+      configType = object({ foo: boolean, bar: boolean });
+    });
+
+    it("works for multiple flags", () => {
+      expect(parseCliArguments(configType, ["--bar"])).toEqual({
+        foo: false,
+        bar: true
+      });
+      expect(parseCliArguments(configType, ["--foo", "--bar"])).toEqual({
+        foo: true,
+        bar: true
+      });
+    });
+
+    it("detects flags out of order", () => {
+      expect(parseCliArguments(configType, ["--bar", "--foo"])).toEqual({
+        foo: true,
+        bar: true
+      });
+    });
+  });
+
+  it("returns an error for invalid arguments", () => {
+    expect(() => parseCliArguments(configType, ["--invalid"])).toThrow(
+      CliArgumentError("invalid argument: --invalid")
+    );
   });
 });

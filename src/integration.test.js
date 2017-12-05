@@ -16,4 +16,12 @@ describe("withCli", () => {
       "{ foo: true, bar: false }"
     );
   });
+
+  it("complains about invalid command line arguments", () => {
+    const process = spawnSync(`${__dirname}/../test/resources/test-script.js`, [
+      "--invalid"
+    ]);
+    expect(process.status).toEqual(42);
+    expect(process.stdout.toString()).toEqual("invalid flag: --invalid");
+  });
 });

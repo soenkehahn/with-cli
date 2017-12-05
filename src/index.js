@@ -40,11 +40,19 @@ export function parseCliArguments<A>(type: Type<A>, args: Array<string>): A {
     const result: A = defaultValue(type);
     const keys: Array<$Keys<typeof type.values>> = Object.keys(type.values);
     _.forEach(result, (value, key) => {
-      if (args.includes(`--${key}`)) {
+      const flag = `--${key}`;
+      if (args.includes(flag)) {
+        args = args.filter(arg => arg !== flag);
         (result: any)[key] = true;
       }
     });
-    return result;
+    if (args.length !== 0) {
+      throw new Error(
+        args.map(invalidArg => `invalid argument: ${invalidArg}`).join("\n")
+      );
+    } else {
+      return result;
+    }
   } else {
     return unsupportedType("parseCliArguments", type);
   }
