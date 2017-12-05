@@ -7,6 +7,7 @@ import {
   BooleanNode,
   StringNode
 } from "validated/schema";
+import * as validated from "validated/schema";
 import _ from "lodash";
 
 export type Type<A> = Node<A>;
@@ -40,7 +41,7 @@ export function parseCliArguments<A>(type: Type<A>, args: Array<string>): A {
     const keys: Array<$Keys<typeof type.values>> = Object.keys(type.values);
     _.forEach(result, (value, key) => {
       if (args.includes(`--${key}`)) {
-        result[key] = true;
+        (result: any)[key] = true;
       }
     });
     return result;
@@ -48,3 +49,12 @@ export function parseCliArguments<A>(type: Type<A>, args: Array<string>): A {
     return unsupportedType("parseCliArguments", type);
   }
 }
+
+export function withCli<A>(type: Type<A>): A {
+  return parseCliArguments(type, process.argv);
+}
+
+// re-exports
+
+export const object = validated.object;
+export const boolean = validated.boolean;
