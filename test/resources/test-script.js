@@ -2,8 +2,7 @@
 
 // @flow
 
-import { withCli } from "../../src";
-import { object, boolean } from "validated/schema";
+import { withCli, object, boolean } from "../../src";
 
 const configType = object({ foo: boolean, bar: boolean });
 
